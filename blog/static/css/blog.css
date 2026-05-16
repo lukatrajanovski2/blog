@@ -69,3 +69,14 @@ h4 {
     color: #FFFFFF;
     background-color: #C25100;
 }
+/* Ова ги средува параграфите во постовите */
+.post p {
+    white-space: pre-wrap;       /* Го прекршува текстот автоматски и ги чува новите редови */
+    word-wrap: break-word;       /* Ги крши екстремно долгите зборови/линкови */
+    overflow-wrap: break-word;
+}
+
+/* Малку простор помеѓу насловот и содржината */
+.page-header {
+    margin-bottom: 30px;
+}

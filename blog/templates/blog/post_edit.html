@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h2>Нова пријава / Измени</h2>
+    <form method="POST" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <div style="margin-top: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; background: #f9f9f9;">
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">Дополнителни слики (прикачи една по една):</label>
+            
+            <div id="dynamic-image-fields">
+                <div style="margin-bottom: 10px;">
+                    <input type="file" name="extra_images" class="form-control-file">
+                </div>
+            </div>
+
+            <button type="button" id="add-more-btn" class="btn btn-info btn-sm" style="margin-top: 5px;">
+                ➕ Додај уште една слика
+            </button>
+        </div>
+
+        <br>
+        <button type="submit" class="save btn btn-success" style="width: 100%; padding: 10px; font-size: 16px;">Зачувај ја пријавата</button>
+    </form>
+
+    <script>
+        document.getElementById('add-more-btn').addEventListener('click', function() {
+            var container = document.getElementById('dynamic-image-fields');
+            
+            // Креираме нов див со инпут за фајл
+            var newFieldWrapper = document.createElement('div');
+            newFieldWrapper.style.marginBottom = "10px";
+            newFieldWrapper.innerHTML = '<input type="file" name="extra_images" class="form-control-file">';
+            
+            container.appendChild(newFieldWrapper);
+        });
+    </script>
+{% endblock %}

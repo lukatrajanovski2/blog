@@ -1,13 +1,81 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    {% for post in posts %}
-        <article class="post">
-            <time class="date">
-                {{ post.published_date }}
-            </time>
-            <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
-            <p>{{ post.text|linebreaksbr }}</p>
-        </article>
-    {% endfor %}
+    <div class="search-container" style="margin-bottom: 25px; margin-top: 15px;">
+        <form id="search-form" method="GET" action="{% url 'post_list' %}" style="display: flex; gap: 10px; width: 100%;">
+            <input type="text" id="search-input" name="search" placeholder="Пребарај име на скемер, инстаграм профил, телефонски број..." value="{{ query|default:'' }}" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px;">
+            {% if query %}
+                <a href="{% url 'post_list' %}" style="padding: 10px 15px; background-color: #6c757d; color: white; border-radius: 6px; text-decoration: none; display: flex; align-items: center; font-weight: bold; font-size: 14px;">X Расчисти</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="posts-holder" style="display: flex; flex-direction: column; gap: 20px;">
+        {% for post in posts %}
+            <article class="post" style="background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e1e4e6; margin-bottom: 0;">
+                <time class="date" style="float: right; color: #aaa; font-size: 13px;">
+                    {{ post.published_date }}
+                </time>
+                <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 22px;">
+                    <a href="{% url 'post_detail' pk=post.pk %}" style="color: #222; text-decoration: none; font-weight: bold;">{{ post.title }}</a>
+                </h2>
+                <p style="color: #444; font-size: 15px; margin-bottom: 15px; line-height: 1.4;">{{ post.text|truncatechars:120 }}</p>
+
+                <div class="comments-section" style="background: #fdfdfd; padding: 12px; border-radius: 6px; border-top: 1px solid #edf0f2;">
+                    <h5 style="margin-top: 0; margin-bottom: 10px; color: #555; font-size: 14px; font-weight: bold;">💬 Искуства ({{ post.comments.count }}):</h5>
+                    
+                    <div class="comments-list" style="max-height: 180px; overflow-y: auto;">
+                        {% for comment in post.comments.all %}
+                            <div class="comment" style="background: #f7f9fa; padding: 8px 12px; border-radius: 5px; margin-bottom: 6px; border-left: 3px solid #d9534f; font-size: 13px;">
+                                <strong style="color: #333;">{{ comment.author }}</strong>
+                                <span style="color: #bbb; font-size: 11px; margin-left: 8px;">{{ comment.created_date|date:"d.m.Y H:i" }}</span>
+                                <p style="margin-top: 3px; margin-bottom: 0; color: #444;">{{ comment.text }}</p>
+                            </div>
+                        {% empty %}
+                            <p style="color: #bbb; font-style: italic; font-size: 13px; margin-bottom: 0;">Сè уште нема коментари.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="add-comment-box" style="margin-top: 12px; border-top: 1px dashed #e2e5e7; padding-top: 10px;">
+                        <form method="POST" action="{% url 'post_list' %}" style="display: flex; flex-direction: column; gap: 6px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.pk }}">
+                            
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" name="text" placeholder="Напиши го твоето искуство..." required style="width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                                <button type="submit" style="background-color: #d9534f; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap;">Објави</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <div style="text-align: center; margin-top: 40px; color: gray;">
+                <p style="font-size: 16px; font-style: italic;">Нема пронајдено резултати.</p>
+                <a href="{% url 'post_list' %}" style="color: #d9534f; text-decoration: underline;">Прикажи ги сите пријави</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('search-form');
+
+        searchInput.addEventListener('keyup', function() {
+            if (searchInput.value.trim() === "") {
+                if (window.location.search !== "") {
+                    window.location.href = "{% url 'post_list' %}";
+                }
+                return;
+            }
+            searchForm.submit();
+        });
+
+        if (searchInput.value.trim() !== "") {
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.focus();
+            searchInput.value = val;
+        }
+    </script>
 {% endblock %}

@@ -1,13 +1,56 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    <article class="post">
+    <article class="post" style="background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e1e4e6; margin-top: 20px;">
+        
         {% if post.published_date %}
-            <div class="date">
+            <time class="date" style="float: right; color: #aaa; font-size: 14px;">
                 {{ post.published_date }}
+            </time>
+        {% endif %}
+        
+        <h1 style="margin-top: 0; margin-bottom: 15px; font-size: 28px; color: #222; font-weight: bold;">
+            {{ post.title }}
+        </h1>
+        
+        <p style="color: #333; font-size: 16px; line-height: 1.6; white-space: pre-wrap; margin-bottom: 25px;">
+            {{ post.text }}
+        </p>
+
+        <div class="post-images" style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; border-top: 1px dashed #eee; padding-top: 20px;">
+            
+            {% if post.image %}
+                <div style="flex: 1 1 calc(33.333% - 15px); min-width: 200px; max-width: 100%;">
+                    <a href="{{ post.image.url }}" target="_blank">
+                        <img src="{{ post.image.url }}" alt="Главна слика" style="width: 100%; height: auto; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); border: 2px solid #d9534f; cursor: pointer;">
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if post.images.all %}
+                {% for img in post.images.all %}
+                    <div style="flex: 1 1 calc(33.333% - 15px); min-width: 200px; max-width: 100%;">
+                        <a href="{{ img.image.url }}" target="_blank">
+                            <img src="{{ img.image.url }}" alt="Дополнителен доказ" style="width: 100%; height: auto; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); border: 1px solid #ddd; cursor: pointer;">
+                        </a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+        </div>
+
+        {% if user.is_authenticated and user == post.author or user.is_superuser %}
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}" style="background-color: #6c757d; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold;">
+                    ✏️ Измени пријава
+                </a>
             </div>
         {% endif %}
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.text|linebreaksbr }}</p>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'post_list' %}" style="color: #d9534f; text-decoration: none; font-size: 15px; font-weight: bold;">
+                ⬅️ Назад кон сите пријави
+            </a>
+        </div>
     </article>
 {% endblock %}
